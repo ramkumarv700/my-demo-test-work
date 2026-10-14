@@ -1,3 +1,4 @@
+
 import { useState } from "react"
 import { Outlet } from "react-router-dom"
 
@@ -5,34 +6,30 @@ import Sidebar from "../components/Sidebar"
 import Header from "../components/Header"
 
 function MainLayout() {
-
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
+  function closeSidebar() {
+    setSidebarOpen(false)
+  }
+
+  function toggleSidebar() {
+    setSidebarOpen((previous) => !previous)
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50">
-
-      {/* Sidebar */}
-
+    <div className="min-h-screen w-full overflow-x-clip bg-[#F5F6FF]">
       <Sidebar
         isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
+        onClose={closeSidebar}
       />
 
+      <div className="min-w-0 lg:ml-64">
+        <Header onMenuClick={toggleSidebar} />
 
-      {/* Main Content */}
-
-      <div className="min-h-screen lg:ml-64">
-
-        <Header
-          onMenuClick={() => setSidebarOpen(true)}
-        />
-
-        <main className="p-4 sm:p-5 md:p-6 lg:p-8">
+        <main className="min-h-[calc(100vh-64px)] min-w-0">
           <Outlet />
         </main>
-
       </div>
-
     </div>
   )
 }

@@ -31,7 +31,7 @@ function Header({ onMenuClick }) {
 
         <button
           onClick={onMenuClick}
-          className="rounded-lg p-2 text-gray-600 hover:bg-gray-100 lg:hidden"
+          className="rounded-full p-2 text-gray-600 hover:bg-gray-100 lg:hidden"
         >
           ☰
         </button>
@@ -73,7 +73,7 @@ function Header({ onMenuClick }) {
 
         <button
           onClick={handleLogout}
-          className="rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50 sm:px-4 sm:text-sm"
+          className="rounded-full border border-[#CBD5E1] px-2 py-2 text-xs font-medium text-[#000000] hover:bg-red-50 sm:px-4 sm:text-sm"
         >
           <span className="hidden sm:inline">
             Logout

@@ -12,7 +12,7 @@ export default function JobProgress() {
   const total = jobProgress.reduce((sum, item) => sum + item.value, 0)
 
   return (
-    <section className="min-w-0 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-5">
+    <section className="min-w-0 rounded-2xl  bg-white p-4  sm:p-5">
       <h2 className="font-semibold text-slate-900">Job Progress</h2>
       <p className="mt-1 text-xs text-slate-400 sm:text-sm">
         Overviews of jobs by current status

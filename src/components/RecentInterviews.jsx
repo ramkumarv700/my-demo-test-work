@@ -27,7 +27,7 @@ export default function RecentInterviews() {
   }, [search])
 
   return (
-    <section className="min-w-0 overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
+    <section className="min-w-0 overflow-hidden rounded-2xl  bg-white ">
       <div className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
         <h2 className="font-semibold text-slate-900">Recent Interviews</h2>
 

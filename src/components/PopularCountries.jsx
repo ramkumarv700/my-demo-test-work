@@ -1,26 +1,42 @@
+
 import { countriesData } from "../data/dashboardData"
 
 export default function PopularCountries() {
   return (
-    <section className="min-w-0 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-5">
-      <h2 className="font-semibold text-slate-900">Popular countries</h2>
-      <p className="mt-1 text-xs text-slate-400">Statistics</p>
+    <section className="flex h-full min-w-0 flex-col rounded-2xl  bg-white p-4  sm:p-5">
+      <h2 className="font-semibold text-slate-900">
+        Popular countries
+      </h2>
 
-      <div className="mt-6 space-y-5">
+      <p className="mt-1 text-xs text-slate-400">
+        Statistics
+      </p>
+
+      <div className="mt-3 flex-1 divide-y divide-transparent">
         {countriesData.map((item) => (
           <div
             key={item.name}
-            className="grid grid-cols-[90px_minmax(0,1fr)] items-center gap-3 sm:grid-cols-[100px_minmax(0,1fr)]"
+            className="grid min-h-[45px] grid-cols-[88px_minmax(0,1fr)] items-center gap-3 py-3 sm:grid-cols-[100px_minmax(0,1fr)]"
           >
-            <span className="text-xs text-slate-500">{item.name}</span>
+            <span className="truncate text-xs text-slate-500">
+              {item.name}
+            </span>
 
-            <div className="h-2.5 overflow-hidden rounded-full bg-violet-50">
+            <div className="h-3 w-full overflow-hidden rounded-full bg-violet-50">
               <div
-                className="h-full rounded-full bg-violet-600 transition-all"
-                style={{ width: `${item.value}%` }}
+                className="h-full rounded-full bg-violet-600 transition-all duration-300"
+                style={{
+                  width: `${Math.min(
+                    100,
+                    Math.max(0, Number(item.value) || 0)
+                  )}%`,
+                }}
                 role="progressbar"
                 aria-label={item.name}
-                aria-valuenow={item.value}
+                aria-valuenow={Math.min(
+                  100,
+                  Math.max(0, Number(item.value) || 0)
+                )}
                 aria-valuemin={0}
                 aria-valuemax={100}
               />
@@ -29,10 +45,14 @@ export default function PopularCountries() {
         ))}
       </div>
 
-      <div className="mt-5 flex justify-between pl-[102px] text-[10px] text-slate-400 sm:pl-[112px]">
-        <span>0%</span>
-        <span>50%</span>
-        <span>100%</span>
+      <div className="mt-2 grid grid-cols-[88px_minmax(0,1fr)] gap-3 sm:grid-cols-[100px_minmax(0,1fr)]">
+        <span aria-hidden="true" />
+
+        <div className="flex justify-between text-[10px] text-slate-400">
+          <span>0%</span>
+          <span>50%</span>
+          <span>100%</span>
+        </div>
       </div>
     </section>
   )

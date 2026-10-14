@@ -1,118 +1,143 @@
 
-import { CalendarDays, Plus, ArrowUpRight } from "lucide-react"
+import { useState } from "react"
+import {
+  CalendarDays,
+  Plus,
+  ArrowUpRight,
+  ChevronDown,
+} from "lucide-react"
 
+import Button from "../components/ui/Button"
 import StatCard from "../components/StatsCard"
 import JobProgress from "../components/JobProgress"
 import PopularCountries from "../components/PopularCountries"
 import TopCandidates from "../components/TopCandidates"
 import RecentInterviews from "../components/RecentInterviews"
 
-import {
-  dashboardStats,
-  jobProgress,
-  countriesData,
-  candidatesData,
-  interviewsData
-} from "../data/dashboardData"
+import { dashboardStats } from "../data/dashboardData"
 
+function Dashboard() {
+  const [dateRange, setDateRange] = useState("Feb 01 – Mar 09, 2026")
 
-const activityItems = [
-  { label: "Interviewed", count: "77 (35%)", icon: "▦" },
-  { label: "Not Shortlisted", count: "50 (65%)", icon: "≋" },
-  { label: "Under Review", count: "18 (23%)", icon: "◎" },
-  { label: "Shortlisted", count: "9 (12%)", icon: "✓" },
-]
-
-function ActivitySummary() {
   return (
-    <section className="min-w-0 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-5">
-      <div className="rounded-xl border border-fuchsia-200 p-4">
-        <p className="text-xs text-slate-500">Total Jobs</p>
-        <div className="mt-1 flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-slate-900">154</h2>
-          <ArrowUpRight className="text-purple-500" size={20} />
-        </div>
-      </div>
+    <main className="w-full min-w-0 space-y-5 overflow-x-hidden bg-[#F5F6FF] p-3 sm:p-5 lg:p-7">
 
-      <p className="mb-3 mt-5 text-xs text-slate-400">Recent activity</p>
+      {/* Heading and actions */}
+      <section className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <p className="text-xs text-slate-500">Hi, Admin</p>
 
-      <div className="space-y-3">
-        {activityItems.map((item) => (
-          <div key={item.label} className="flex items-center gap-3">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-50 text-sm text-violet-600">
-              {item.icon}
-            </div>
-
-            <p className="min-w-0 flex-1 text-xs font-medium text-slate-600">
-              {item.label}
-            </p>
-
-            <span className="shrink-0 text-[11px] font-semibold text-slate-700">
-              {item.count}
-            </span>
-          </div>
-        ))}
-      </div>
-    </section>
-  )
-}
-
-export default function Dashboard() {
-  return (
-    <div className="mx-auto w-full max-w-[1600px] space-y-5">
-
-      {/* Dashboard heading */}
-      <section className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="text-xs font-medium text-slate-500">Hi Andrei,</p>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">
+          <h1 className="mt-1 text-2xl font-bold text-slate-900 sm:text-3xl">
             Welcome to Demo
           </h1>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <button
-            type="button"
-            onClick={() => alert("Date range selection will be connected next.")}
-            className="flex items-center gap-2 rounded-full border border-fuchsia-200 bg-white px-3 py-2 text-xs font-medium text-purple-700 hover:bg-purple-50 sm:px-4"
-          >
-            <CalendarDays size={15} />
-            Feb 01 – Mar 09, 2026
-          </button>
+          <label className="flex h-10 max-w-full items-center gap-2 rounded-full border border-fuchsia-200 bg-white px-3">
+            <CalendarDays size={16} className="shrink-0 text-violet-600" />
 
-          <button
+            <select
+              value={dateRange}
+              onChange={(event) => setDateRange(event.target.value)}
+              aria-label="Select date range"
+              className="min-w-0 max-w-52 bg-transparent text-xs text-slate-700 outline-none"
+            >
+              <option>Feb 01 – Mar 09, 2026</option>
+              <option>Last 7 days</option>
+              <option>Last 30 days</option>
+              <option>This month</option>
+            </select>
+
+            <ChevronDown size={14} className="shrink-0 text-slate-400" />
+          </label>
+
+          <Button
             type="button"
-            onClick={() => alert("Next, we will connect this to the Create Interview page.")}
-            className="flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-600 to-fuchsia-500 px-4 py-2.5 text-xs font-semibold text-white shadow-sm hover:opacity-90"
+            onClick={() => console.log("Create Interview clicked")}
           >
-            <Plus size={15} />
+            <Plus size={16} />
             Create Interview
-          </button>
+          </Button>
         </div>
       </section>
 
-      {/* 4 summary cards */}
-      <section className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 xl:grid-cols-4">
+      {/* Statistics */}
+      <section
+        aria-label="Dashboard statistics"
+        className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4"
+      >
         {dashboardStats.map((stat) => (
-          <StatCard key={stat.title} {...stat} />
+          <StatCard
+            key={stat.label}
+            {...stat}
+          />
         ))}
       </section>
 
       {/* Job progress and activity */}
-      <section className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.7fr)_minmax(280px,0.8fr)]">
-        <JobProgress />
-        <ActivitySummary />
+      <section className="grid min-w-0 grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.7fr)_minmax(0,0.9fr)]">
+        <div className="min-w-0 overflow-hidden rounded-2xl">
+          <JobProgress />
+        </div>
+
+        <section className="min-w-0 rounded-2xl  bg-white p-4  sm:p-5">
+          <div className="flex items-center justify-between gap-3 rounded-xl border border-fuchsia-200 p-4">
+            <div>
+              <p className="text-xs text-slate-500">Total Jobs</p>
+              <h2 className="mt-1 text-2xl font-bold text-slate-900">
+                154
+              </h2>
+            </div>
+
+            <ArrowUpRight size={20} className="text-violet-600" />
+          </div>
+
+          <h3 className="mb-4 mt-6 text-xs text-slate-400">
+            Recent activity
+          </h3>
+
+          <div className="space-y-5">
+            {[
+              { label: "Interviewed", value: "77 (35%)" },
+              { label: "Not Shortlisted", value: "50 (65%)" },
+              { label: "Under Review", value: "18 (23%)" },
+              { label: "Shortlisted", value: "9 (12%)" },
+            ].map((item) => (
+              <div
+                key={item.label}
+                className="flex min-w-0 items-center justify-between gap-3"
+              >
+                <span className="truncate text-xs text-slate-600">
+                  {item.label}
+                </span>
+
+                <span className="shrink-0 text-xs font-medium text-slate-700">
+                  {item.value}
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
       </section>
 
       {/* Countries and candidates */}
-      <section className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <PopularCountries />
-        <TopCandidates />
+      <section className="grid min-w-0 grid-cols-1 gap-4 lg:grid-cols-2">
+        <div className="min-w-0 overflow-hidden rounded-2xl">
+          <PopularCountries />
+        </div>
+
+        <div className="min-w-0 overflow-hidden rounded-2xl">
+          <TopCandidates />
+        </div>
       </section>
 
-      {/* Interviews table */}
-      <RecentInterviews />
+      {/* Recent interviews */}
+      <section className="min-w-0 overflow-hidden rounded-2xl">
+        <RecentInterviews />
+      </section>
 
-    </div>
+    </main>
   )
 }
+
+export default Dashboard

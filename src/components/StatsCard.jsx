@@ -9,7 +9,7 @@ const colorStyles = {
 
 export default function StatCard({ title, value, color }) {
   return (
-    <article className="relative min-w-0 rounded-xl border border-slate-100 bg-white p-4 shadow-sm sm:p-5">
+    <article className="relative min-w-0 rounded-xl border border-slate-100 bg-white p-4  sm:p-5">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <p className="text-xs text-slate-400 sm:text-sm">{title}</p>

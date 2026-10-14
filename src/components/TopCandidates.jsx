@@ -3,7 +3,7 @@ import { candidatesData } from "../data/dashboardData"
 
 export default function TopCandidates() {
   return (
-    <section className="min-w-0 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-5">
+    <section className="min-w-0 rounded-2xl  bg-white p-4  sm:p-5">
       <div className="flex items-center justify-between gap-2">
         <h2 className="font-semibold text-slate-900">Top 5 Candidates</h2>
 
