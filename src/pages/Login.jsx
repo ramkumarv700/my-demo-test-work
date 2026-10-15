@@ -8,7 +8,6 @@ import TextField from "../components/ui/TextField"
 import loginImage from "../assets/image 1.png"
 import brandLogo from "../assets/brandLogo.png"
 
-
 function Login() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -50,9 +49,8 @@ function Login() {
           <div className="mb-10">
             <img
               src={brandLogo}
-              alt="Workinfo login illustration"
-              className="h-[200px] w-[200px] object-contain object-left"
-
+              alt="Workinfo Logo"
+              className="h-auto max-h-[100px] w-auto max-w-[220px] object-contain object-left"
             />
           </div>
 
@@ -114,19 +112,16 @@ function Login() {
         </div>
       </section>
 
-
       {/* Right: Image Area — 60% */}
       <section className="relative hidden min-h-screen items-center justify-center overflow-hidden bg-[#F5F6FF] p-8 lg:flex xl:p-12">
         <div className="flex h-full w-full items-center justify-center">
           <img
             src={loginImage}
             alt="Workinfo login illustration"
-            className="h-[500px] w-[500px] object-contain"
-
+            className="block h-auto max-h-[80vh] w-full max-w-[600px] object-contain"
           />
         </div>
       </section>
-
 
     </main>
   )
