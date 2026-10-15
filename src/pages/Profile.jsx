@@ -1,20 +1,16 @@
+
 function Profile() {
-
   return (
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <div className="lg:col-span-1">
+        Profile Card
+      </div>
 
-    <div className="p-6">
-
-      <h1 className="text-3xl font-bold text-gray-900">
-        Profile
-      </h1>
-
-      <p className="mt-2 text-gray-500">
-        Manage your profile here.
-      </p>
-
+      <div className="lg:col-span-2">
+        Profile Details
+      </div>
     </div>
-
-  )
+  );
 }
 
-export default Profile
+export default Profile;

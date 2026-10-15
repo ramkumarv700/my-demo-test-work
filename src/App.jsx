@@ -1,8 +1,9 @@
+
 import {
   BrowserRouter,
   Routes,
   Route,
-  Navigate
+  Navigate,
 } from "react-router-dom"
 
 import MainLayout from "./layout/MainLayout"
@@ -15,29 +16,22 @@ import Settings from "./pages/Settings"
 import Profile from "./pages/Profile"
 import Contact from "./pages/Contact"
 import C2 from "./pages/C2"
+import CreateInterview from "./pages/CreateInterview"
 
 function App() {
   return (
     <BrowserRouter>
-
       <Routes>
-
         {/* Login */}
-
         <Route
           path="/login"
           element={<Login />}
         />
 
-
         {/* Protected Application */}
-
         <Route element={<ProtectedRoute />}>
-
           {/* Common Layout */}
-
           <Route element={<MainLayout />}>
-
             <Route
               path="/dashboard"
               element={<Dashboard />}
@@ -68,38 +62,26 @@ function App() {
               element={<C2 />}
             />
 
+            {/* Create Interview */}
+            <Route
+              path="/create-interview"
+              element={<CreateInterview />}
+            />
           </Route>
-
         </Route>
 
-
         {/* Default */}
-
         <Route
           path="/"
-          element={
-            <Navigate
-              to="/login"
-              replace
-            />
-          }
+          element={<Navigate to="/login" replace />}
         />
 
-
-        {/* Unknown */}
-
+        {/* Unknown Route */}
         <Route
           path="*"
-          element={
-            <Navigate
-              to="/login"
-              replace
-            />
-          }
+          element={<Navigate to="/login" replace />}
         />
-
       </Routes>
-
     </BrowserRouter>
   )
 }

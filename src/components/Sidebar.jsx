@@ -8,6 +8,7 @@ import {
   Layers,
   X,
 } from "lucide-react"
+import brandLogo from "../assets/brandLogo.png"
 
 function Sidebar({ isOpen, onClose }) {
   const menuItems = [
@@ -41,9 +42,12 @@ function Sidebar({ isOpen, onClose }) {
         `}
       >
         <div className="flex h-16 shrink-0 items-center justify-between border-b border-slate-200 px-5">
-          <h1 className="text-xl font-bold text-slate-900">
-            Workinfo
-          </h1>
+          <img
+            src={brandLogo}
+            alt="Workinfo login illustration"
+            className="h-[100px] w-[100px] object-contain object-left"
+
+          />
 
           <button
             type="button"
@@ -72,10 +76,9 @@ function Sidebar({ isOpen, onClose }) {
                   focus-visible:outline-2
                   focus-visible:outline-offset-2
                   focus-visible:outline-violet-600
-                  ${
-                    isActive
-                      ? "bg-violet-500 text-white hover:bg-violet-700"
-                      : "text-slate-600 hover:bg-violet-50 hover:text-violet-700"
+                  ${isActive
+                    ? "bg-violet-500 text-white hover:bg-violet-700"
+                    : "text-slate-600 hover:bg-violet-50 hover:text-violet-700"
                   }
                 `}
               >

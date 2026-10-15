@@ -1,5 +1,6 @@
 
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 import {
   CalendarDays,
   Plus,
@@ -18,6 +19,7 @@ import { dashboardStats } from "../data/dashboardData"
 
 function Dashboard() {
   const [dateRange, setDateRange] = useState("Feb 01 – Mar 09, 2026")
+  const navigate = useNavigate()
 
   return (
     <main className="w-full min-w-0 space-y-5 overflow-x-hidden bg-[#F5F6FF] p-3 sm:p-5 lg:p-7">
@@ -53,7 +55,7 @@ function Dashboard() {
 
           <Button
             type="button"
-            onClick={() => console.log("Create Interview clicked")}
+            onClick={() => navigate("/create-interview")}
           >
             <Plus size={16} />
             Create Interview
@@ -80,7 +82,7 @@ function Dashboard() {
           <JobProgress />
         </div>
 
-        <section className="min-w-0 rounded-2xl  bg-white p-4  sm:p-5">
+        <section className="min-w-0 rounded-2xl bg-white p-4 sm:p-5">
           <div className="flex items-center justify-between gap-3 rounded-xl border border-fuchsia-200 p-4">
             <div>
               <p className="text-xs text-slate-500">Total Jobs</p>
