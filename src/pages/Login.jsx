@@ -5,7 +5,9 @@ import { useNavigate } from "react-router-dom"
 import { login } from "../redux/slices/authSlice"
 import Button from "../components/ui/Button"
 import TextField from "../components/ui/TextField"
-import loginImage from "../assets/login-image.png"
+import loginImage from "../assets/image 1.png"
+import brandLogo from "../assets/brandLogo.png"
+
 
 function Login() {
   const dispatch = useDispatch()
@@ -46,9 +48,12 @@ function Login() {
 
           {/* Brand */}
           <div className="mb-10">
-            <h1 className="text-2xl font-bold text-slate-900">
-              Workinfo
-            </h1>
+            <img
+              src={brandLogo}
+              alt="Workinfo login illustration"
+              className="h-[200px] w-[200px] object-contain object-left"
+
+            />
           </div>
 
           {/* Heading */}
@@ -109,18 +114,19 @@ function Login() {
         </div>
       </section>
 
+
       {/* Right: Image Area — 60% */}
       <section className="relative hidden min-h-screen items-center justify-center overflow-hidden bg-[#F5F6FF] p-8 lg:flex xl:p-12">
-
         <div className="flex h-full w-full items-center justify-center">
           <img
             src={loginImage}
             alt="Workinfo login illustration"
-            className="h-full max-h-[80vh] w-full object-contain"
+            className="h-[500px] w-[500px] object-contain"
+
           />
         </div>
-
       </section>
+
 
     </main>
   )

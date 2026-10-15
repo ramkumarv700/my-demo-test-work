@@ -21,7 +21,7 @@ function Header({ onMenuClick }) {
 
   return (
 
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-white px-4 sm:px-5 md:px-6">
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-200 bg-white px-4 sm:px-5 md:px-6">
 
       {/* Left */}
 
@@ -73,7 +73,7 @@ function Header({ onMenuClick }) {
 
         <button
           onClick={handleLogout}
-          className="rounded-full border border-[#CBD5E1] px-2 py-2 text-xs font-medium text-[#000000] hover:bg-red-50 sm:px-4 sm:text-sm"
+          className="rounded-full border border-[#CBD5E1] px-2 py-1 text-xs font-medium text-[#000000] hover:bg-red-50 sm:px-4 sm:text-sm"
         >
           <span className="hidden sm:inline">
             Logout

@@ -27,7 +27,7 @@ function TextField({
         aria-describedby={
           error ? `${inputId}-error` : undefined
         }
-        className={`h-11 w-full rounded-lg border bg-white px-3 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 ${
+        className={`h-11 w-full rounded-full border bg-white px-3 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 ${
           error
             ? "border-red-500"
             : "border-slate-300"
