@@ -1,5 +1,6 @@
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   Clock3,
   MessageSquare,
@@ -8,18 +9,18 @@ import {
   Pencil,
   Trash2,
   X,
-  Check,
 } from "lucide-react";
 
 function formatDate(timestamp) {
   if (!timestamp) return "";
+
   return new Date(timestamp).toLocaleDateString("en-IN", {
     day: "numeric",
     month: "short",
   });
 }
 
-export default function ChatHistory({
+function ChatHistory({
   chats = [],
   activeChatId,
   onSelectChat,
@@ -28,34 +29,62 @@ export default function ChatHistory({
   mobileHistoryOpen = false,
 }) {
   const [search, setSearch] = useState("");
-  const [menuId, setMenuId] = useState(null);
-  const [renameTarget, setRenameTarget] = useState(null);
+  const [menuChatId, setMenuChatId] = useState(null);
+  const [renameChat, setRenameChat] = useState(null);
   const [renameValue, setRenameValue] = useState("");
-  const [deleteTarget, setDeleteTarget] = useState(null);
-  const [deletingId, setDeletingId] = useState(null);
+  const [deleteChat, setDeleteChat] = useState(null);
+
+  const menuRef = useRef(null);
   const renameInputRef = useRef(null);
 
-  useEffect(() => {
-    if (renameTarget) {
-      renameInputRef.current?.focus();
-      renameInputRef.current?.select();
-    }
-  }, [renameTarget]);
+  const modalOpen = Boolean(renameChat || deleteChat);
 
   useEffect(() => {
-    function closeMenu(event) {
-      if (!event.target.closest("[data-chat-menu]")) {
-        setMenuId(null);
+    function handleOutsideClick(event) {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setMenuChatId(null);
       }
     }
 
-    document.addEventListener("click", closeMenu);
-    return () => document.removeEventListener("click", closeMenu);
+    document.addEventListener("mousedown", handleOutsideClick);
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
   }, []);
 
-  const filteredChats = [...chats]
+  useEffect(() => {
+    if (renameChat) {
+      renameInputRef.current?.focus();
+      renameInputRef.current?.select();
+    }
+  }, [renameChat]);
+
+  useEffect(() => {
+    if (!modalOpen) return;
+
+    function handleEscape(event) {
+      if (event.key === "Escape") {
+        setRenameChat(null);
+        setDeleteChat(null);
+      }
+    }
+
+    const previousOverflow = document.body.style.overflow;
+
+    document.addEventListener("keydown", handleEscape);
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [modalOpen]);
+
+  const filteredChats = chats
     .filter((chat) => {
-      const query = search.trim().toLowerCase();
+      const query = search.toLowerCase().trim();
+
       if (!query) return true;
 
       return (
@@ -68,106 +97,199 @@ export default function ChatHistory({
     .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
 
   function openRename(chat) {
-    setRenameTarget(chat);
+    setRenameChat(chat);
     setRenameValue(chat.title || "");
-    setMenuId(null);
+    setMenuChatId(null);
   }
 
-  function saveRename(event) {
+  function submitRename(event) {
     event.preventDefault();
 
     const title = renameValue.trim();
-    if (!title || !renameTarget) return;
 
-    onRenameChat?.(renameTarget.id, title);
-    setRenameTarget(null);
+    if (!title || !renameChat) return;
+
+    onRenameChat?.(renameChat.id, title);
+    setRenameChat(null);
     setRenameValue("");
   }
 
   function confirmDelete() {
-    if (!deleteTarget) return;
+    if (!deleteChat) return;
 
-    const id = deleteTarget.id;
-    setDeletingId(id);
-    setMenuId(null);
-
-    // Allow the exit animation to finish before removing the chat.
-    window.setTimeout(() => {
-      onDeleteChat?.(id);
-      setDeleteTarget(null);
-      setDeletingId(null);
-    }, 220);
+    onDeleteChat?.(deleteChat.id);
+    setDeleteChat(null);
+    setMenuChatId(null);
   }
 
   return (
     <>
-      {/* Desktop history panel */}
-      <aside className="hidden min-h-[620px] min-w-0 flex-col rounded-2xl border border-slate-200 bg-white p-4 lg:flex">
-        <div className="mb-4 flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-violet-100 text-violet-600">
-            <Clock3 size={18} />
+      <aside
+        className={`chat-history-panel flex min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white ${
+          mobileHistoryOpen
+            ? "fixed inset-3 z-40 h-[calc(100dvh-24px)] shadow-xl lg:static lg:inset-auto lg:z-auto lg:h-full lg:shadow-none"
+            : "hidden lg:flex lg:h-full"
+        }`}
+      >
+        {/* Fixed header and search */}
+        <div className="shrink-0 border-b border-slate-100 p-4">
+          <div className="mb-4 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <Clock3 size={18} className="text-violet-600" />
+              <h2 className="text-sm font-semibold text-slate-900">
+                Chat History
+              </h2>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => onSelectChat?.(null)}
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 lg:hidden"
+              aria-label="Close chat history"
+            >
+              <X size={18} />
+            </button>
           </div>
-          <div>
-            <h2 className="text-sm font-semibold text-slate-900">
-              Chat History
-            </h2>
-            <p className="mt-0.5 text-xs text-slate-500">
-              Your conversations
-            </p>
-          </div>
-        </div>
 
-        <div className="relative mb-4">
-          <Search
-            size={16}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-          />
-          <input
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search chats..."
-            aria-label="Search chats"
-            className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-9 pr-3 text-xs outline-none transition focus:border-violet-300 focus:bg-white"
-          />
-        </div>
+          <label className="flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 transition focus-within:border-violet-400">
+            <Search size={16} className="shrink-0 text-slate-400" />
 
-        <div className="mb-3 flex items-center justify-between">
-          <span className="text-xs font-semibold text-slate-500">
-            RECENT CHATS
-          </span>
-          <span className="rounded-full bg-violet-50 px-2 py-1 text-[10px] font-medium text-violet-600">
-            {filteredChats.length}
-          </span>
-        </div>
-
-        <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
-          {filteredChats.map((chat) => (
-            <ChatRow
-              key={chat.id}
-              chat={chat}
-              active={chat.id === activeChatId}
-              menuOpen={menuId === chat.id}
-              deleting={deletingId === chat.id}
-              onSelect={() => onSelectChat?.(chat.id)}
-              onMenu={() =>
-                setMenuId((current) =>
-                  current === chat.id ? null : chat.id
-                )
-              }
-              onRename={() => openRename(chat)}
-              onDelete={() => {
-                setDeleteTarget(chat);
-                setMenuId(null);
-              }}
+            <input
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Search chats..."
+              aria-label="Search chat history"
+              className="min-w-0 flex-1 bg-transparent text-xs text-slate-700 outline-none placeholder:text-slate-400"
             />
-          ))}
 
-          {filteredChats.length === 0 && (
-            <div className="px-3 py-10 text-center">
-              <MessageSquare
-                size={22}
-                className="mx-auto mb-2 text-slate-300"
-              />
+            {search && (
+              <button
+                type="button"
+                onClick={() => setSearch("")}
+                aria-label="Clear search"
+                className="text-slate-400 hover:text-slate-700"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </label>
+        </div>
+
+        {/* Only this list scrolls */}
+        <div className="min-h-0 flex-1 space-y-1 overflow-y-auto overscroll-contain p-3">
+          <div className="mb-2 flex items-center justify-between px-1 py-1">
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+              Recent chats
+            </p>
+
+            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-violet-50 px-1.5 text-[10px] font-medium text-violet-600">
+              {filteredChats.length}
+            </span>
+          </div>
+
+          {filteredChats.length > 0 ? (
+            filteredChats.map((chat) => {
+              const lastUserMessage = [...(chat.messages || [])]
+                .reverse()
+                .find((message) => message.role === "user");
+
+              const isActive = chat.id === activeChatId;
+              const isMenuOpen = menuChatId === chat.id;
+
+              return (
+                <div
+                  key={chat.id}
+                  className={`group relative flex min-w-0 items-start gap-2 rounded-xl border p-2.5 transition ${
+                    isActive
+                      ? "border-violet-200 bg-violet-50"
+                      : "border-transparent hover:bg-slate-50"
+                  }`}
+                >
+                  <button
+                    type="button"
+                    onClick={() => onSelectChat?.(chat.id)}
+                    className="flex min-w-0 flex-1 items-start gap-2.5 text-left"
+                  >
+                    <span
+                      className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${
+                        isActive
+                          ? "bg-violet-100 text-violet-600"
+                          : "bg-slate-100 text-slate-500"
+                      }`}
+                    >
+                      <MessageSquare size={15} />
+                    </span>
+
+                    <span className="min-w-0 flex-1">
+                      <span
+                        className={`block truncate text-xs font-medium ${
+                          isActive ? "text-violet-700" : "text-slate-800"
+                        }`}
+                      >
+                        {chat.title || "New conversation"}
+                      </span>
+
+                      <span className="mt-1 block truncate text-[11px] text-slate-500">
+                        {lastUserMessage?.text || "No messages yet"}
+                      </span>
+
+                      <span className="mt-2 block text-[10px] text-slate-400">
+                        {formatDate(chat.updatedAt)}
+                      </span>
+                    </span>
+                  </button>
+
+                  <div
+                    ref={isMenuOpen ? menuRef : null}
+                    className="relative shrink-0"
+                  >
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setMenuChatId(isMenuOpen ? null : chat.id)
+                      }
+                      className={`flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition hover:bg-white hover:text-violet-600 ${
+                        isMenuOpen
+                          ? "visible"
+                          : "invisible group-hover:visible focus:visible"
+                      }`}
+                      aria-label={`Actions for ${chat.title || "conversation"}`}
+                      aria-expanded={isMenuOpen}
+                    >
+                      <MoreVertical size={16} />
+                    </button>
+
+                    {isMenuOpen && (
+                      <div className="absolute right-0 top-8 z-30 w-36 overflow-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-lg">
+                        <button
+                          type="button"
+                          onClick={() => openRename(chat)}
+                          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs text-slate-700 hover:bg-violet-50 hover:text-violet-700"
+                        >
+                          <Pencil size={14} />
+                          Rename
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setDeleteChat(chat);
+                            setMenuChatId(null);
+                          }}
+                          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs text-red-600 hover:bg-red-50"
+                        >
+                          <Trash2 size={14} />
+                          Delete
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <div className="px-3 py-8 text-center">
+              <Search size={22} className="mx-auto mb-2 text-slate-300" />
               <p className="text-xs font-medium text-slate-600">
                 No conversations found
               </p>
@@ -178,336 +300,125 @@ export default function ChatHistory({
           )}
         </div>
 
-        <div className="mt-4 border-t border-slate-100 pt-3">
-          <p className="text-center text-[10px] text-slate-400">
+        {/* Fixed footer */}
+        <div className="shrink-0 border-t border-slate-100 px-3 py-3 text-center">
+          <p className="text-[10px] text-slate-400">
             Conversations are saved on this device
           </p>
         </div>
       </aside>
 
-      {/* Mobile history drawer */}
-      {mobileHistoryOpen && (
-        <div className="fixed inset-0 z-40 lg:hidden">
-          <button
-            type="button"
-            aria-label="Close chat history"
-            onClick={() => onSelectChat?.(activeChatId)}
-            className="absolute inset-0 bg-slate-950/30 backdrop-blur-[2px]"
-          />
-
-          <aside className="absolute bottom-0 right-0 top-0 flex w-[min(88vw,340px)] flex-col bg-white p-4 shadow-2xl animate-[historySlideIn_180ms_ease-out]">
-            <div className="mb-4 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-violet-100 text-violet-600">
-                  <Clock3 size={18} />
-                </div>
-                <div>
-                  <h2 className="text-sm font-semibold text-slate-900">
-                    Chat History
-                  </h2>
-                  <p className="text-xs text-slate-500">
-                    Your conversations
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => onSelectChat?.(activeChatId)}
-                aria-label="Close history"
-                className="rounded-lg p-2 text-slate-500 hover:bg-slate-100"
-              >
-                <X size={19} />
-              </button>
-            </div>
-
-            <div className="relative mb-4">
-              <Search
-                size={16}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-              />
-              <input
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search chats..."
-                aria-label="Search chats"
-                className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-9 pr-3 text-xs outline-none focus:border-violet-300 focus:bg-white"
-              />
-            </div>
-
-            <div className="min-h-0 flex-1 space-y-2 overflow-y-auto">
-              {filteredChats.map((chat) => (
-                <ChatRow
-                  key={chat.id}
-                  chat={chat}
-                  active={chat.id === activeChatId}
-                  menuOpen={menuId === chat.id}
-                  deleting={deletingId === chat.id}
-                  onSelect={() => onSelectChat?.(chat.id)}
-                  onMenu={() =>
-                    setMenuId((current) =>
-                      current === chat.id ? null : chat.id
-                    )
-                  }
-                  onRename={() => openRename(chat)}
-                  onDelete={() => {
-                    setDeleteTarget(chat);
-                    setMenuId(null);
-                  }}
-                />
-              ))}
-
-              {filteredChats.length === 0 && (
-                <p className="py-10 text-center text-xs text-slate-500">
-                  No conversations found.
-                </p>
-              )}
-            </div>
-          </aside>
-        </div>
-      )}
-
       {/* Rename modal */}
-      {renameTarget && (
-        <div
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/40 p-4 backdrop-blur-[3px] animate-[historyFadeIn_160ms_ease-out]"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) {
-              setRenameTarget(null);
-            }
-          }}
-        >
-          <form
-            onSubmit={saveRename}
-            className="w-full max-w-md rounded-2xl border border-violet-100 bg-white p-5 shadow-2xl animate-[historyModalIn_180ms_ease-out] sm:p-6"
+      {renameChat &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-[9999] flex items-center justify-center overflow-y-auto bg-slate-900/40 p-4 backdrop-blur-sm"
+            onMouseDown={(event) => {
+              if (event.target === event.currentTarget) {
+                setRenameChat(null);
+              }
+            }}
           >
-            <div className="mb-5 flex items-start justify-between">
-              <div>
-                <h3 className="text-base font-semibold text-slate-900">
-                  Rename chat
-                </h3>
-                <p className="mt-1 text-xs text-slate-500">
-                  Choose a clear name for this conversation.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setRenameTarget(null)}
-                aria-label="Close rename dialog"
-                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            <label
-              htmlFor="rename-chat-input"
-              className="mb-2 block text-xs font-medium text-slate-700"
+            <form
+              onSubmit={submitRename}
+              className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl"
             >
-              Chat name
-            </label>
-            <input
-              ref={renameInputRef}
-              id="rename-chat-input"
-              value={renameValue}
-              onChange={(event) => setRenameValue(event.target.value)}
-              maxLength={100}
-              required
-              className="h-11 w-full rounded-xl border border-slate-200 px-3 text-sm text-slate-800 outline-none focus:border-violet-400 focus:ring-4 focus:ring-violet-100"
-              placeholder="Enter chat name"
-            />
+              <h3 className="text-base font-semibold text-slate-900">
+                Rename conversation
+              </h3>
 
-            <div className="mt-5 flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setRenameTarget(null)}
-                className="h-10 rounded-xl border border-slate-200 px-4 text-xs font-medium text-slate-600 transition hover:bg-slate-50"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={!renameValue.trim()}
-                className="flex h-10 items-center gap-2 rounded-xl bg-violet-600 px-4 text-xs font-medium text-white transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <Check size={15} />
-                Save changes
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
+              <p className="mt-1 text-xs text-slate-500">
+                Enter a new name for this conversation.
+              </p>
+
+              <input
+                ref={renameInputRef}
+                value={renameValue}
+                onChange={(event) => setRenameValue(event.target.value)}
+                maxLength={80}
+                className="mt-4 h-10 w-full rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-violet-400"
+                placeholder="Conversation name"
+                required
+              />
+
+              <div className="mt-4 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setRenameChat(null)}
+                  className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  className="rounded-xl bg-violet-600 px-4 py-2 text-xs font-medium text-white hover:bg-violet-700"
+                >
+                  Save changes
+                </button>
+              </div>
+            </form>
+          </div>,
+          document.body
+        )}
 
       {/* Delete confirmation modal */}
-      {deleteTarget && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/40 p-4 backdrop-blur-[3px] animate-[historyFadeIn_160ms_ease-out]">
-          <div className="w-full max-w-sm rounded-2xl border border-slate-100 bg-white p-5 shadow-2xl animate-[historyModalIn_180ms_ease-out] sm:p-6">
-            <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-rose-50 text-rose-600">
-              <Trash2 size={20} />
-            </div>
-            <h3 className="text-base font-semibold text-slate-900">
-              Delete this chat?
-            </h3>
-            <p className="mt-2 text-sm leading-6 text-slate-500">
-              Are you sure you want to delete{" "}
-              <span className="font-medium text-slate-700">
-                “{deleteTarget.title || "Untitled chat"}”
-              </span>
-              ? This action cannot be undone.
-            </p>
+      {deleteChat &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-[9999] flex items-center justify-center overflow-y-auto bg-slate-900/40 p-4 backdrop-blur-sm"
+            onMouseDown={(event) => {
+              if (event.target === event.currentTarget) {
+                setDeleteChat(null);
+              }
+            }}
+          >
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="delete-conversation-title"
+              className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl"
+            >
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 text-red-600">
+                <Trash2 size={19} />
+              </div>
 
-            <div className="mt-6 flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setDeleteTarget(null)}
-                disabled={deletingId !== null}
-                className="h-10 rounded-xl border border-slate-200 px-4 text-xs font-medium text-slate-600 transition hover:bg-slate-50 disabled:opacity-50"
+              <h3
+                id="delete-conversation-title"
+                className="mt-3 text-base font-semibold text-slate-900"
               >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={confirmDelete}
-                disabled={deletingId !== null}
-                className="flex h-10 items-center gap-2 rounded-xl bg-rose-600 px-4 text-xs font-medium text-white transition hover:bg-rose-700 disabled:opacity-60"
-              >
-                <Trash2 size={14} />
-                {deletingId ? "Deleting..." : "Delete chat"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+                Delete conversation?
+              </h3>
 
-      <style>{`
-        @keyframes historyFadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes historyModalIn {
-          from { opacity: 0; transform: translateY(10px) scale(.98); }
-          to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @keyframes historySlideIn {
-          from { transform: translateX(20px); opacity: .7; }
-          to { transform: translateX(0); opacity: 1; }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          *, *::before, *::after {
-            animation-duration: .01ms !important;
-            transition-duration: .01ms !important;
-          }
-        }
-      `}</style>
+              <p className="mt-2 text-sm leading-6 text-slate-500">
+                This will delete &quot;
+                {deleteChat.title || "New conversation"}&quot; from your chat
+                history. This action cannot be undone.
+              </p>
+
+              <div className="mt-5 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setDeleteChat(null)}
+                  className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="button"
+                  onClick={confirmDelete}
+                  className="rounded-xl bg-red-600 px-4 py-2 text-xs font-medium text-white hover:bg-red-700"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
     </>
   );
 }
 
-function ChatRow({
-  chat,
-  active,
-  menuOpen,
-  deleting,
-  onSelect,
-  onMenu,
-  onRename,
-  onDelete,
-}) {
-  const lastUserMessage = [...(chat.messages || [])]
-    .reverse()
-    .find((message) => message.role === "user");
-
-  return (
-    <div
-      className={`group relative rounded-xl transition-all duration-200 ${
-        deleting
-          ? "translate-x-3 scale-95 opacity-0"
-          : "translate-x-0 scale-100 opacity-100"
-      } ${
-        active
-          ? "border border-violet-200 bg-violet-50"
-          : "border border-transparent hover:border-slate-100 hover:bg-slate-50"
-      }`}
-    >
-      <button
-        type="button"
-        onClick={onSelect}
-        className="w-full min-w-0 rounded-xl py-3 pl-3 pr-10 text-left"
-      >
-        <div className="flex min-w-0 items-start gap-2">
-          <MessageSquare
-            size={15}
-            className={`mt-0.5 shrink-0 ${
-              active ? "text-violet-600" : "text-slate-400"
-            }`}
-          />
-          <div className="min-w-0 flex-1">
-            <p
-              className={`truncate text-xs font-semibold ${
-                active ? "text-violet-800" : "text-slate-700"
-              }`}
-            >
-              {chat.title || "New conversation"}
-            </p>
-            <p className="mt-1 truncate text-[11px] leading-4 text-slate-500">
-              {lastUserMessage?.text || "No messages yet"}
-            </p>
-            <p className="mt-2 text-[10px] text-slate-400">
-              {formatDate(chat.updatedAt)}
-            </p>
-          </div>
-        </div>
-      </button>
-
-      <div
-        data-chat-menu
-        className={`absolute right-2 top-2 z-20 ${
-          menuOpen ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-        } transition-opacity`}
-      >
-        <button
-          type="button"
-          onClick={(event) => {
-            event.stopPropagation();
-            onMenu();
-          }}
-          aria-label={`Options for ${chat.title || "chat"}`}
-          aria-expanded={menuOpen}
-          className={`flex h-7 w-7 items-center justify-center rounded-lg transition ${
-            menuOpen
-              ? "bg-violet-100 text-violet-700"
-              : "text-slate-400 hover:bg-white hover:text-slate-700"
-          }`}
-        >
-          <MoreVertical size={17} />
-        </button>
-
-        {menuOpen && (
-          <div className="absolute right-0 top-8 z-30 w-40 overflow-hidden rounded-xl border border-slate-100 bg-white p-1.5 shadow-xl animate-[historyFadeIn_120ms_ease-out]">
-            <button
-              type="button"
-              onClick={(event) => {
-                event.stopPropagation();
-                onRename();
-              }}
-              className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-xs text-slate-700 transition hover:bg-violet-50 hover:text-violet-700"
-            >
-              <Pencil size={14} />
-              Rename chat
-            </button>
-            <button
-              type="button"
-              onClick={(event) => {
-                event.stopPropagation();
-                onDelete();
-              }}
-              className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-xs text-rose-600 transition hover:bg-rose-50"
-            >
-              <Trash2 size={14} />
-              Delete chat
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
+export default ChatHistory;

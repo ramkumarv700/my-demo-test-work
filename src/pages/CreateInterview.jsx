@@ -10,14 +10,16 @@ import {
   UserRound,
   X,
 } from "lucide-react";
+
 import ChatHistory from "../components/chat/ChatHistory";
+import Breadcrumb from "../components/common/Breadcrumb";
 
 const STORAGE_KEY = "workinfo-interview-history";
 
 const createGreeting = () => ({
   id: "greeting",
   role: "assistant",
-  text: "Hi! Welcome to your AI Job Description Generator. Tell me about the role you're hiring for, and I'll help you create an interview-ready job description.",
+  text: "Hi! 👋 Welcome to your AI Job Description Generator. Tell me about the role you're hiring for, and I'll help you create an interview-ready job description.",
 });
 
 function createChat() {
@@ -35,11 +37,9 @@ function loadChats() {
     const saved = localStorage.getItem(STORAGE_KEY);
     const parsed = saved ? JSON.parse(saved) : [];
 
-    if (Array.isArray(parsed) && parsed.length > 0) {
-      return parsed;
-    }
-
-    return [createChat()];
+    return Array.isArray(parsed) && parsed.length
+      ? parsed
+      : [createChat()];
   } catch (error) {
     console.error("Unable to load chat history:", error);
     return [createChat()];
@@ -63,7 +63,6 @@ function CreateInterview() {
 
   const draft = activeChat?.draft || "";
 
-  // Save chats to localStorage.
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(chats));
@@ -72,11 +71,8 @@ function CreateInterview() {
     }
   }, [chats]);
 
-  // Stop voice recognition when the page unmounts.
   useEffect(() => {
-    return () => {
-      recognitionRef.current?.stop();
-    };
+    return () => recognitionRef.current?.stop();
   }, []);
 
   function updateActiveChat(updates) {
@@ -91,7 +87,6 @@ function CreateInterview() {
     );
   }
 
-  // Create a new conversation.
   function handleNewChat() {
     recognitionRef.current?.stop();
     setListening(false);
@@ -104,7 +99,6 @@ function CreateInterview() {
     setMobileHistoryOpen(false);
   }
 
-  // Select an existing conversation.
   function handleSelectChat(chatId) {
     if (!chatId) {
       setMobileHistoryOpen(false);
@@ -118,7 +112,6 @@ function CreateInterview() {
     setMobileHistoryOpen(false);
   }
 
-  // Rename a conversation.
   function handleRenameChat(chatId, newTitle) {
     const cleanTitle = newTitle.trim();
     if (!cleanTitle) return;
@@ -126,21 +119,14 @@ function CreateInterview() {
     setChats((previous) =>
       previous.map((chat) =>
         chat.id === chatId
-          ? {
-              ...chat,
-              title: cleanTitle,
-              updatedAt: Date.now(),
-            }
+          ? { ...chat, title: cleanTitle, updatedAt: Date.now() }
           : chat
       )
     );
   }
 
-  // Delete a conversation.
   function handleDeleteChat(chatId) {
-    const remainingChats = chats.filter(
-      (chat) => chat.id !== chatId
-    );
+    const remainingChats = chats.filter((chat) => chat.id !== chatId);
 
     if (remainingChats.length === 0) {
       const freshChat = createChat();
@@ -158,7 +144,6 @@ function CreateInterview() {
     setMobileHistoryOpen(false);
   }
 
-  // Attach files.
   function handleAttachment(event) {
     const files = Array.from(event.target.files || []);
     if (!files.length) return;
@@ -173,11 +158,9 @@ function CreateInterview() {
     );
   }
 
-  // Voice input.
   function handleSpeak() {
     const SpeechRecognition =
-      window.SpeechRecognition ||
-      window.webkitSpeechRecognition;
+      window.SpeechRecognition || window.webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
       alert("Voice input is not supported in this browser. Try Chrome.");
@@ -206,15 +189,15 @@ function CreateInterview() {
 
       if (transcript) {
         const currentDraft = textareaRef.current?.value || "";
-        const updatedDraft = `${currentDraft} ${transcript}`.trim();
 
-        updateActiveChat({ draft: updatedDraft });
+        updateActiveChat({
+          draft: `${currentDraft} ${transcript}`.trim(),
+        });
       }
     };
 
     recognition.onend = () => setListening(false);
     recognition.onerror = () => setListening(false);
-
     recognitionRef.current = recognition;
 
     try {
@@ -226,15 +209,12 @@ function CreateInterview() {
     }
   }
 
-  // Submit a chat message.
   function handleSubmit(event) {
     event.preventDefault();
 
     const text = draft.trim();
 
-    if ((!text && attachments.length === 0) || !activeChat) {
-      return;
-    }
+    if ((!text && attachments.length === 0) || !activeChat) return;
 
     const firstUserMessage = !activeChat.messages.some(
       (message) => message.role === "user"
@@ -255,8 +235,10 @@ function CreateInterview() {
           ? {
               ...chat,
               title: firstUserMessage
-                ? (text || attachmentNames[0] || "New conversation")
-                    .slice(0, 42)
+                ? (text || attachmentNames[0] || "New conversation").slice(
+                    0,
+                    42
+                  )
                 : chat.title,
               draft: "",
               updatedAt: Date.now(),
@@ -268,13 +250,23 @@ function CreateInterview() {
 
     setAttachments([]);
 
-    // AI responses require backend/API integration.
+    // Connect your AI backend/API here to generate assistant responses.
   }
 
   return (
-    <main className="min-w-0 bg-[#F5F6FF] p-3 sm:p-5 lg:p-6">
+    <main className="flex min-h-0 min-w-0 flex-col bg-[#F5F6FF] p-3 sm:p-5 lg:h-[calc(100dvh-66px)] lg:overflow-hidden lg:p-6">
+      {/* Breadcrumb stays above the flexible workspace */}
+      <div className="shrink-0">
+        <Breadcrumb
+          items={[
+            { label: "Dashboard", to: "/dashboard" },
+            { label: "Create Interview" },
+          ]}
+        />
+      </div>
+
       {/* Page heading */}
-      <header className="mb-6 flex items-center justify-between gap-3">
+      <header className="mb-4 flex shrink-0 items-center justify-between gap-3 sm:mb-5">
         <div className="flex min-w-0 items-center gap-3">
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-violet-100 text-violet-600">
             <Sparkles size={22} />
@@ -301,10 +293,12 @@ function CreateInterview() {
         </button>
       </header>
 
-      <section className="grid min-w-0 grid-cols-1 items-stretch gap-4 lg:grid-cols-[minmax(0,1fr)_290px]">
-        {/* AI Hiring Assistant: entrance animation added */}
-        <div className="create-interview-panel flex min-h-[620px] min-w-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white">
-          <div className="flex items-center justify-between border-b border-slate-100 px-4 py-4 sm:px-6">
+      {/* Flexible workspace: takes the remaining desktop height */}
+      <section className="interview-workspace-enter grid min-h-0 min-w-0 flex-1 grid-cols-1 items-stretch gap-4 lg:grid-cols-[minmax(0,1fr)_268px]">
+        {/* AI Hiring Assistant */}
+        <div className="flex min-h-[420px] min-w-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white lg:h-full lg:min-h-0">
+          {/* Panel header */}
+          <div className="flex shrink-0 items-center justify-between gap-3 border-b border-slate-100 px-4 py-4 sm:px-6">
             <div className="flex min-w-0 items-center gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-100 text-violet-600">
                 <Bot size={21} />
@@ -323,22 +317,20 @@ function CreateInterview() {
             <button
               type="button"
               onClick={handleNewChat}
-              className="flex h-9 shrink-0 items-center gap-2 rounded-xl bg-violet-600 px-3 text-xs font-medium text-white transition hover:bg-violet-700"
+              className="flex h-9 shrink-0 items-center gap-2 rounded-full border border-[#CBD5E1] px-3 text-xs font-medium text-gray-700 transition hover:bg-violet-600 hover:text-white sm:text-sm"
             >
               <Plus size={15} />
-              <span className="hidden sm:inline">New chat</span>
+              <span>New chat</span>
             </button>
           </div>
 
-          {/* Messages */}
-          <div className="flex-1 space-y-5 overflow-y-auto p-4 sm:p-6">
+          {/* Only this message area scrolls */}
+          <div className="min-h-0 flex-1 space-y-5 overflow-y-auto p-4 sm:p-6">
             {activeChat?.messages.map((message) => (
               <div
                 key={message.id}
                 className={`flex gap-3 ${
-                  message.role === "user"
-                    ? "justify-end"
-                    : "justify-start"
+                  message.role === "user" ? "justify-end" : "justify-start"
                 }`}
               >
                 {message.role === "assistant" && (
@@ -404,22 +396,20 @@ function CreateInterview() {
             )}
           </div>
 
-          {/* Chat composer */}
-          <div className="sticky bottom-0 bg-white p-3 pt-2 sm:p-5 sm:pt-2">
+          {/* Composer stays at the bottom of the panel */}
+          <div className="shrink-0 bg-white p-3 pt-2 sm:p-5 sm:pt-2">
             <form
               onSubmit={handleSubmit}
-              className="rounded-[32px] border border-violet-200 bg-white p-2 shadow-[0_8px_28px_rgba(124,58,237,0.12)] transition focus-within:border-violet-400"
+              className="rounded-[28px] border border-violet-200 bg-white p-3 shadow-[0_8px_28px_rgba(124,58,237,0.12)] transition focus-within:border-violet-400 sm:p-4"
             >
               {attachments.length > 0 && (
-                <div className="flex flex-wrap gap-2 px-3 pb-2 pt-1">
+                <div className="flex flex-wrap gap-2 px-2 pb-2 pt-1">
                   {attachments.map((file, index) => (
                     <span
                       key={`${file.name}-${index}`}
                       className="inline-flex max-w-full items-center gap-2 rounded-lg bg-violet-50 px-2 py-1 text-xs text-violet-700"
                     >
-                      <span className="max-w-44 truncate">
-                        {file.name}
-                      </span>
+                      <span className="max-w-44 truncate">{file.name}</span>
                       <button
                         type="button"
                         onClick={() => removeAttachment(index)}
@@ -436,7 +426,7 @@ function CreateInterview() {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:border-violet-300 hover:bg-violet-50 hover:text-violet-600"
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:border-violet-300 hover:bg-violet-50 hover:text-violet-600 sm:h-11 sm:w-11"
                   aria-label="Attach file"
                   title="Attach file"
                 >
@@ -494,7 +484,7 @@ function CreateInterview() {
                 <button
                   type="submit"
                   disabled={!draft.trim() && attachments.length === 0}
-                  className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-violet-600 text-white shadow-md transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-violet-600 text-white shadow-md transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-50 sm:h-12 sm:w-12"
                   aria-label="Send message"
                   title="Send message"
                 >
@@ -509,8 +499,8 @@ function CreateInterview() {
           </div>
         </div>
 
-        {/* Chat History: entrance animation added */}
-        <div className="chat-history-panel min-w-0">
+        {/* Chat History uses the same available height */}
+        <div className="min-h-0 min-w-0 lg:h-full">
           <ChatHistory
             chats={chats}
             activeChatId={activeChat?.id}

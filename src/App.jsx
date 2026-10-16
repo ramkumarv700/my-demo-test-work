@@ -4,25 +4,25 @@ import {
   Routes,
   Route,
   Navigate,
-} from "react-router-dom"
+} from "react-router-dom";
 
-import MainLayout from "./layout/MainLayout"
-import ProtectedRoute from "./components/ProtectedRoute"
+import MainLayout from "./layout/MainLayout";
+import ProtectedRoute from "./components/ProtectedRoute";
 
-import Login from "./pages/Login"
-import Dashboard from "./pages/Dashboard"
-import Users from "./pages/Users"
-import Settings from "./pages/Settings"
-import Profile from "./pages/Profile"
-import Contact from "./pages/Contact"
-import C2 from "./pages/C2"
-import CreateInterview from "./pages/CreateInterview"
+import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
+import Users from "./pages/Users";
+import Settings from "./pages/Settings";
+import Profile from "./pages/Profile";
+import Contact from "./pages/Contact";
+import C2 from "./pages/C2";
+import CreateInterview from "./pages/CreateInterview";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Login */}
+        {/* Login Page */}
         <Route
           path="/login"
           element={<Login />}
@@ -30,7 +30,7 @@ function App() {
 
         {/* Protected Application */}
         <Route element={<ProtectedRoute />}>
-          {/* Common Layout */}
+          {/* Common Layout: Sidebar + Header */}
           <Route element={<MainLayout />}>
             <Route
               path="/dashboard"
@@ -62,7 +62,7 @@ function App() {
               element={<C2 />}
             />
 
-            {/* Create Interview */}
+            {/* Create Interview Page */}
             <Route
               path="/create-interview"
               element={<CreateInterview />}
@@ -70,7 +70,7 @@ function App() {
           </Route>
         </Route>
 
-        {/* Default */}
+        {/* Default Route */}
         <Route
           path="/"
           element={<Navigate to="/login" replace />}
@@ -83,7 +83,7 @@ function App() {
         />
       </Routes>
     </BrowserRouter>
-  )
+  );
 }
 
-export default App
+export default App;

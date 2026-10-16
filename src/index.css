@@ -1,5 +1,7 @@
 
 @import "tailwindcss";
+
+/* General fade-in animation */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -10,6 +12,7 @@
   }
 }
 
+/* Modal entrance animation */
 @keyframes modalIn {
   from {
     opacity: 0;
@@ -22,6 +25,7 @@
   }
 }
 
+/* Kebab menu entrance animation */
 @keyframes menuIn {
   from {
     opacity: 0;
@@ -34,17 +38,8 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .group,
-  .group * {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
-/* Create Interview page entrance animation */
-
-@keyframes interviewRiseIn {
+/* Create Interview workspace: both panels animate together */
+@keyframes interviewWorkspaceEnter {
   from {
     opacity: 0;
     transform: translateY(48px);
@@ -56,24 +51,28 @@
   }
 }
 
-.create-interview-panel {
-  animation: interviewRiseIn 750ms cubic-bezier(0.22, 1, 0.36, 1)
-    both;
-  will-change: transform, opacity;
+.interview-workspace-enter {
+  animation: interviewWorkspaceEnter 800ms
+    cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/* Chat History height only — no separate entrance animation */
 .chat-history-panel {
-  animation: interviewRiseIn 850ms cubic-bezier(0.22, 1, 0.36, 1)
-    120ms both;
-  will-change: transform, opacity;
+  height: 100%;
+  min-height: 0;
 }
 
+/* Respect users who prefer reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .create-interview-panel,
-  .chat-history-panel {
+  .group,
+  .group * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .interview-workspace-enter {
     animation: none;
-    transform: none;
     opacity: 1;
-    will-change: auto;
+    transform: none;
   }
 }
