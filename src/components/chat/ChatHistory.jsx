@@ -36,7 +36,6 @@ function ChatHistory({
 
   const menuRef = useRef(null);
   const renameInputRef = useRef(null);
-
   const modalOpen = Boolean(renameChat || deleteChat);
 
   useEffect(() => {
@@ -47,10 +46,7 @@ function ChatHistory({
     }
 
     document.addEventListener("mousedown", handleOutsideClick);
-
-    return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
-    };
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, []);
 
   useEffect(() => {
@@ -71,7 +67,6 @@ function ChatHistory({
     }
 
     const previousOverflow = document.body.style.overflow;
-
     document.addEventListener("keydown", handleEscape);
     document.body.style.overflow = "hidden";
 
@@ -83,8 +78,7 @@ function ChatHistory({
 
   const filteredChats = chats
     .filter((chat) => {
-      const query = search.toLowerCase().trim();
-
+      const query = search.trim().toLowerCase();
       if (!query) return true;
 
       return (
@@ -96,17 +90,10 @@ function ChatHistory({
     })
     .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
 
-  function openRename(chat) {
-    setRenameChat(chat);
-    setRenameValue(chat.title || "");
-    setMenuChatId(null);
-  }
-
   function submitRename(event) {
     event.preventDefault();
 
     const title = renameValue.trim();
-
     if (!title || !renameChat) return;
 
     onRenameChat?.(renameChat.id, title);
@@ -131,7 +118,6 @@ function ChatHistory({
             : "hidden lg:flex lg:h-full"
         }`}
       >
-        {/* Fixed header and search */}
         <div className="shrink-0 border-b border-slate-100 p-4">
           <div className="mb-4 flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
@@ -144,16 +130,15 @@ function ChatHistory({
             <button
               type="button"
               onClick={() => onSelectChat?.(null)}
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 lg:hidden"
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 lg:hidden"
               aria-label="Close chat history"
             >
               <X size={18} />
             </button>
           </div>
 
-          <label className="flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 transition focus-within:border-violet-400">
+          <label className="flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 focus-within:border-violet-400">
             <Search size={16} className="shrink-0 text-slate-400" />
-
             <input
               value={search}
               onChange={(event) => setSearch(event.target.value)}
@@ -175,19 +160,18 @@ function ChatHistory({
           </label>
         </div>
 
-        {/* Only this list scrolls */}
+        {/* Scrollable conversation list */}
         <div className="min-h-0 flex-1 space-y-1 overflow-y-auto overscroll-contain p-3">
           <div className="mb-2 flex items-center justify-between px-1 py-1">
             <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
               Recent chats
             </p>
-
             <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-violet-50 px-1.5 text-[10px] font-medium text-violet-600">
               {filteredChats.length}
             </span>
           </div>
 
-          {filteredChats.length > 0 ? (
+          {filteredChats.length ? (
             filteredChats.map((chat) => {
               const lastUserMessage = [...(chat.messages || [])]
                 .reverse()
@@ -248,7 +232,7 @@ function ChatHistory({
                       onClick={() =>
                         setMenuChatId(isMenuOpen ? null : chat.id)
                       }
-                      className={`flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition hover:bg-white hover:text-violet-600 ${
+                      className={`flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 hover:bg-white hover:text-violet-600 ${
                         isMenuOpen
                           ? "visible"
                           : "invisible group-hover:visible focus:visible"
@@ -263,7 +247,11 @@ function ChatHistory({
                       <div className="absolute right-0 top-8 z-30 w-36 overflow-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-lg">
                         <button
                           type="button"
-                          onClick={() => openRename(chat)}
+                          onClick={() => {
+                            setRenameChat(chat);
+                            setRenameValue(chat.title || "");
+                            setMenuChatId(null);
+                          }}
                           className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs text-slate-700 hover:bg-violet-50 hover:text-violet-700"
                         >
                           <Pencil size={14} />
@@ -300,7 +288,6 @@ function ChatHistory({
           )}
         </div>
 
-        {/* Fixed footer */}
         <div className="shrink-0 border-t border-slate-100 px-3 py-3 text-center">
           <p className="text-[10px] text-slate-400">
             Conversations are saved on this device
@@ -308,15 +295,12 @@ function ChatHistory({
         </div>
       </aside>
 
-      {/* Rename modal */}
       {renameChat &&
         createPortal(
           <div
             className="fixed inset-0 z-[9999] flex items-center justify-center overflow-y-auto bg-slate-900/40 p-4 backdrop-blur-sm"
             onMouseDown={(event) => {
-              if (event.target === event.currentTarget) {
-                setRenameChat(null);
-              }
+              if (event.target === event.currentTarget) setRenameChat(null);
             }}
           >
             <form
@@ -326,7 +310,6 @@ function ChatHistory({
               <h3 className="text-base font-semibold text-slate-900">
                 Rename conversation
               </h3>
-
               <p className="mt-1 text-xs text-slate-500">
                 Enter a new name for this conversation.
               </p>
@@ -336,9 +319,9 @@ function ChatHistory({
                 value={renameValue}
                 onChange={(event) => setRenameValue(event.target.value)}
                 maxLength={80}
-                className="mt-4 h-10 w-full rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-violet-400"
-                placeholder="Conversation name"
                 required
+                placeholder="Conversation name"
+                className="mt-4 h-10 w-full rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-violet-400"
               />
 
               <div className="mt-4 flex justify-end gap-2">
@@ -349,7 +332,6 @@ function ChatHistory({
                 >
                   Cancel
                 </button>
-
                 <button
                   type="submit"
                   className="rounded-xl bg-violet-600 px-4 py-2 text-xs font-medium text-white hover:bg-violet-700"
@@ -362,15 +344,12 @@ function ChatHistory({
           document.body
         )}
 
-      {/* Delete confirmation modal */}
       {deleteChat &&
         createPortal(
           <div
             className="fixed inset-0 z-[9999] flex items-center justify-center overflow-y-auto bg-slate-900/40 p-4 backdrop-blur-sm"
             onMouseDown={(event) => {
-              if (event.target === event.currentTarget) {
-                setDeleteChat(null);
-              }
+              if (event.target === event.currentTarget) setDeleteChat(null);
             }}
           >
             <div
@@ -391,9 +370,8 @@ function ChatHistory({
               </h3>
 
               <p className="mt-2 text-sm leading-6 text-slate-500">
-                This will delete &quot;
-                {deleteChat.title || "New conversation"}&quot; from your chat
-                history. This action cannot be undone.
+                This will delete &quot;{deleteChat.title || "New conversation"}&quot;
+                from your chat history. This action cannot be undone.
               </p>
 
               <div className="mt-5 flex justify-end gap-2">
@@ -404,7 +382,6 @@ function ChatHistory({
                 >
                   Cancel
                 </button>
-
                 <button
                   type="button"
                   onClick={confirmDelete}

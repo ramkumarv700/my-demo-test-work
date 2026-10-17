@@ -1,39 +1,30 @@
 
-function Button({
+export default function Button({
   children,
-  variant = "primary",
-  size = "md",
-  className = "",
+  onClick,
   type = "button",
-  ...props
+  variant = "primary",
+  disabled = false,
+  className = "",
 }) {
-  const base =
-    "inline-flex items-center justify-center gap-2 rounded-full font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-600 disabled:opacity-50 disabled:pointer-events-none"
+  const baseClasses =
+    "inline-flex items-center justify-center gap-2 rounded-full px-6 py-2.5 text-[13px] font-semibold transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50";
 
   const variants = {
     primary:
-      "bg-violet-600 text-white hover:bg-violet-700",
+      "bg-gradient-to-r from-[#4F39F6] to-[#9810FA] text-white shadow-sm hover:opacity-95",
     secondary:
-      "border border-violet-100 bg-white text-violet-700 hover:bg-violet-50",
-    ghost:
-      "bg-transparent text-slate-600 hover:bg-violet-50",
-  }
-
-  const sizes = {
-    sm: "min-h-9 px-3 text-xs",
-    md: "min-h-10 px-4 text-sm",
-    lg: "min-h-11 px-5 text-sm",
-  }
+      "border border-[#E5E7EB] bg-white text-[#374151] hover:bg-violet-50",
+  };
 
   return (
     <button
       type={type}
-      className={`${base} ${variants[variant] ?? variants.primary} ${sizes[size] ?? sizes.md} ${className}`}
-      {...props}
+      onClick={onClick}
+      disabled={disabled}
+      className={`${baseClasses} ${variants[variant] || variants.primary} ${className}`}
     >
       {children}
     </button>
-  )
+  );
 }
-
-export default Button
