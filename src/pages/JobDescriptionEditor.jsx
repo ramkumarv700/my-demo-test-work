@@ -167,7 +167,7 @@ function SkillTags({ skills, onChange, placeholder }) {
   }
 
   return (
-    <div className="flex min-h-[44px] min-w-0 flex-wrap items-center gap-2 rounded-lg border border-fuchsia-200 bg-white px-3 py-2 transition focus-within:border-violet-400 focus-within:ring-2 focus-within:ring-violet-100">
+    <div className="flex min-h-[44px] min-w-0 flex-wrap items-center gap-2 rounded-lg bg-white px-3 py-2 transition focus-within:border-violet-400 focus-within:ring-2 focus-within:ring-violet-100">
       {skills.map((skill) => (
         <span
           key={skill}
@@ -349,6 +349,31 @@ function JobDescriptionEditor() {
           overflow-wrap: anywhere;
         }
 
+        /* Basic Information field alignment */
+        .job-basic-grid {
+          align-items: start;
+        }
+
+        .job-basic-grid > div {
+          min-width: 0;
+          align-self: start;
+        }
+
+        .job-basic-grid label {
+          display: block;
+          margin-bottom: 6px;
+          line-height: 20px;
+        }
+
+        .job-basic-grid input,
+        .job-basic-grid select {
+          box-sizing: border-box;
+          width: 100%;
+          min-width: 0;
+          height: 44px;
+          min-height: 44px;
+        }
+
         @media (max-width: 639px) {
           .jd-rich-editor .ql-toolbar {
             padding: 10px 8px;
@@ -407,7 +432,7 @@ function JobDescriptionEditor() {
       {/* Editor and preview */}
       <section className="grid min-w-0 grid-cols-1 items-stretch gap-4 xl:auto-rows-fr xl:grid-cols-[minmax(0,1fr)_minmax(300px,0.42fr)]">
         {/* Left: Rich-text JD editor */}
-        <section className="flex min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm xl:h-full">
+        <section className="flex min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl bg-white xl:h-full">
           <div className="shrink-0 border-b border-slate-100 px-4 py-4 sm:px-5">
             <h2 className="text-sm font-semibold text-slate-800">
               Job description
@@ -441,7 +466,7 @@ function JobDescriptionEditor() {
         </section>
 
         {/* Right: Live preview */}
-        <aside className="flex min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm xl:h-full">
+        <aside className="flex min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl bg-white xl:h-full">
           <div className="shrink-0 border-b border-slate-100 px-4 py-4">
             <h2 className="text-sm font-semibold text-slate-800">
               Live preview
@@ -511,17 +536,18 @@ function JobDescriptionEditor() {
       </section>
 
       {/* Job Details */}
-      <section className="mt-5 min-w-0 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-5 lg:p-6">
+      <section className="mt-5 min-w-0 rounded-2xl bg-white p-4 sm:p-5 lg:p-6">
         <h2 className="text-base font-bold text-slate-800">
           Job Details
         </h2>
 
+        {/* Basic Information */}
         <div className="mt-5">
           <FieldLabel icon={BriefcaseBusiness}>
             Basic Information
           </FieldLabel>
 
-          <div className="mt-3 grid min-w-0 grid-cols-1 items-start gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="job-basic-grid mt-3 grid min-w-0 grid-cols-1 items-start gap-4 md:grid-cols-2 xl:grid-cols-3">
             <div className="min-w-0">
               <TextField
                 label="Job Title"
@@ -573,6 +599,7 @@ function JobDescriptionEditor() {
           </div>
         </div>
 
+        {/* Location and Department */}
         <div className="mt-6">
           <FieldLabel icon={MapPin}>
             Location &amp; Department
@@ -693,6 +720,7 @@ function JobDescriptionEditor() {
           </div>
         </div>
 
+        {/* Skills */}
         <div className="mt-6">
           <FieldLabel icon={Code2}>Skills</FieldLabel>
 
@@ -725,7 +753,7 @@ function JobDescriptionEditor() {
       </section>
 
       {/* Footer actions */}
-      <div className="mt-4 flex flex-col-reverse items-stretch justify-between gap-3 rounded-2xl  p-3 sm:flex-row sm:items-center">
+      <div className="mt-4 flex flex-col-reverse items-stretch justify-between gap-3 rounded-2xl p-3 sm:flex-row sm:items-center">
         <Button
           variant="secondary"
           onClick={() => navigate(-1)}

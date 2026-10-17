@@ -1,6 +1,10 @@
 
 @import "tailwindcss";
 
+/* =========================================
+   GENERAL ANIMATIONS
+========================================= */
+
 /* General fade-in animation */
 @keyframes fadeIn {
   from {
@@ -38,7 +42,7 @@
   }
 }
 
-/* Create Interview workspace: both panels animate together */
+/* Create Interview workspace animation */
 @keyframes interviewWorkspaceEnter {
   from {
     opacity: 0;
@@ -56,27 +60,16 @@
     cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* Chat History height only — no separate entrance animation */
+/* Chat History height only */
 .chat-history-panel {
   height: 100%;
   min-height: 0;
 }
 
-/* Respect users who prefer reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  .group,
-  .group * {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-  }
+/* =========================================
+   RICH TEXT EDITOR
+========================================= */
 
-  .interview-workspace-enter {
-    animation: none;
-    opacity: 1;
-    transform: none;
-  }
-}
-/* Rich text editor */
 .jd-rich-editor .quill {
   display: flex;
   flex-direction: column;
@@ -154,7 +147,10 @@
   fill: #7c3aed;
 }
 
-/* Live preview */
+/* =========================================
+   LIVE PREVIEW
+========================================= */
+
 .jd-preview-content {
   overflow-wrap: anywhere;
 }
@@ -204,20 +200,8 @@
   text-decoration: underline;
 }
 
-@media (max-width: 640px) {
-  .jd-rich-editor .ql-editor {
-    min-height: 260px;
-    padding: 16px;
-  }
-
-  .jd-rich-editor .ql-toolbar.ql-snow {
-    padding: 8px;
-  }
-}
-
 /* =========================================
    RESPONSIVE TYPOGRAPHY SYSTEM
-   Shared across the entire application
 ========================================= */
 
 @layer base {
@@ -296,3 +280,112 @@
   }
 }
 
+/* =========================================
+   STAT CARD — 1px CLOCKWISE BORDER
+   Violet-700: #6D28D9
+========================================= */
+
+.stat-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+  background: #ffffff;
+  transition: box-shadow 300ms ease;
+}
+
+/* Animated gradient ring — exactly 1px */
+.stat-card-border {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  padding: 1px;
+  border-radius: inherit;
+
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg 300deg,
+    #6d28d9 330deg,
+    #8b5cf6 345deg,
+    transparent 360deg
+  );
+
+  opacity: 0;
+  pointer-events: none;
+  animation: none;
+
+  /* Cut out the center to leave a 1px ring */
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+/* Keep the content above the border */
+.stat-card-content {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  border-radius: inherit;
+  background: #ffffff;
+}
+
+/* Start animation on hover only */
+.stat-card:hover .stat-card-border {
+  opacity: 1;
+  animation: stat-card-clockwise 2s linear infinite;
+}
+
+.stat-card:hover {
+  box-shadow: 0 8px 24px rgb(109 40 217 / 10%);
+}
+
+/* Clockwise motion */
+@keyframes stat-card-clockwise {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================================
+   RESPONSIVE ADJUSTMENTS
+========================================= */
+
+@media (max-width: 640px) {
+  .jd-rich-editor .ql-editor {
+    min-height: 260px;
+    padding: 16px;
+  }
+
+  .jd-rich-editor .ql-toolbar.ql-snow {
+    padding: 8px;
+  }
+}
+
+/* =========================================
+   REDUCED MOTION ACCESSIBILITY
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .group,
+  .group * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .interview-workspace-enter {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .stat-card:hover .stat-card-border {
+    animation: none;
+  }
+}
