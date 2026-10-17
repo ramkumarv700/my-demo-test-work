@@ -17,6 +17,9 @@ import Profile from "./pages/Profile";
 import Contact from "./pages/Contact";
 import C2 from "./pages/C2";
 import CreateInterview from "./pages/CreateInterview";
+import JobDescriptionEditor from "./pages/JobDescriptionEditor";
+
+import Breadcrumb from "./components/common/Breadcrumb";
 
 function App() {
   return (
@@ -62,10 +65,16 @@ function App() {
               element={<C2 />}
             />
 
-            {/* Create Interview Page */}
+            {/* Existing Create Interview Page */}
             <Route
               path="/create-interview"
               element={<CreateInterview />}
+            />
+
+            {/* New Job Description Editor Page */}
+            <Route
+              path="/job-description-editor"
+              element={<JobDescriptionEditor />}
             />
           </Route>
         </Route>

@@ -12,7 +12,7 @@ export default function Button({
 
   const variants = {
     primary:
-      "bg-gradient-to-r from-[#4F39F6] to-[#9810FA] text-white shadow-sm hover:opacity-95",
+      "bg-violet-700 text-white shadow-sm hover:opacity-95",
     secondary:
       "border border-[#E5E7EB] bg-white text-[#374151] hover:bg-violet-50",
   };

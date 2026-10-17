@@ -11,6 +11,7 @@ import {
   X,
 } from "lucide-react";
 
+import { useNavigate } from "react-router-dom";
 import Breadcrumb from "../components/common/Breadcrumb";
 import ChatHistory from "../components/chat/ChatHistory";
 import JDResult from "../components/chat/JDResult";
@@ -40,15 +41,17 @@ function createChat() {
 function loadChats() {
   try {
     const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-    return Array.isArray(parsed) && parsed.length ? parsed : [createChat()];
+    return Array.isArray(parsed) && parsed.length
+      ? parsed
+      : [createChat()];
   } catch {
     return [createChat()];
   }
 }
 
 /*
-  Frontend preview generator.
-  Replace this function with your AI backend API when available.
+  Existing frontend JD preview generator.
+  Connect your AI backend here when available.
 */
 function generateJD(prompt) {
   const normalized = prompt.toLowerCase();
@@ -62,37 +65,102 @@ function generateJD(prompt) {
     {
       keys: ["frontend", "front-end", "react", "web developer"],
       title: "Frontend Developer",
-      primary: ["HTML5, CSS3, JavaScript", "React.js and reusable UI components", "Responsive design and REST API integration"],
-      secondary: ["TypeScript and Git", "Accessibility and web performance", "Unit testing and debugging"],
-      responsibilities: ["Build responsive, accessible web interfaces.", "Develop and maintain reusable components.", "Collaborate with UI/UX designers and backend developers.", "Optimize application performance and troubleshoot issues."],
+      primary: [
+        "HTML5, CSS3, JavaScript",
+        "React.js and reusable UI components",
+        "Responsive design and REST API integration",
+      ],
+      secondary: [
+        "TypeScript and Git",
+        "Accessibility and web performance",
+        "Unit testing and debugging",
+      ],
+      responsibilities: [
+        "Build responsive, accessible web interfaces.",
+        "Develop and maintain reusable components.",
+        "Collaborate with UI/UX designers and backend developers.",
+        "Optimize application performance and troubleshoot issues.",
+      ],
     },
     {
       keys: ["backend", "back-end", "node.js", "nodejs", "python", "django"],
       title: "Backend Developer",
-      primary: ["Backend development with relevant frameworks", "REST APIs and database design", "Authentication, validation and error handling"],
-      secondary: ["Git and CI/CD workflows", "Cloud deployment and monitoring", "Automated testing and documentation"],
-      responsibilities: ["Design and maintain reliable backend services.", "Build secure APIs and integrate databases.", "Improve performance, scalability and reliability.", "Collaborate with frontend and product teams."],
+      primary: [
+        "Backend development with relevant frameworks",
+        "REST APIs and database design",
+        "Authentication, validation and error handling",
+      ],
+      secondary: [
+        "Git and CI/CD workflows",
+        "Cloud deployment and monitoring",
+        "Automated testing and documentation",
+      ],
+      responsibilities: [
+        "Design and maintain reliable backend services.",
+        "Build secure APIs and integrate databases.",
+        "Improve performance, scalability and reliability.",
+        "Collaborate with frontend and product teams.",
+      ],
     },
     {
       keys: ["ui/ux", "ui ux", "product designer", "user experience"],
       title: "UI/UX Designer",
-      primary: ["User research and interaction design", "Wireframes, prototypes and visual design", "Figma and design systems"],
-      secondary: ["Usability testing and accessibility", "Design handoff and developer collaboration", "Analytics and iterative improvement"],
-      responsibilities: ["Understand user needs and business goals.", "Create user flows, wireframes and interactive prototypes.", "Design consistent, accessible product experiences.", "Collaborate with product managers and developers."],
+      primary: [
+        "User research and interaction design",
+        "Wireframes, prototypes and visual design",
+        "Figma and design systems",
+      ],
+      secondary: [
+        "Usability testing and accessibility",
+        "Design handoff and developer collaboration",
+        "Analytics and iterative improvement",
+      ],
+      responsibilities: [
+        "Understand user needs and business goals.",
+        "Create user flows, wireframes and interactive prototypes.",
+        "Design consistent, accessible product experiences.",
+        "Collaborate with product managers and developers.",
+      ],
     },
     {
       keys: ["data analyst", "data scientist", "analytics"],
       title: "Data Analyst",
-      primary: ["SQL and data analysis", "Python or spreadsheet-based analysis", "Dashboards and data visualization"],
-      secondary: ["Statistics and data quality", "Power BI or Tableau", "Stakeholder communication"],
-      responsibilities: ["Collect, clean and analyze relevant datasets.", "Build reports and dashboards for decision-making.", "Identify trends, patterns and actionable insights.", "Communicate findings to business stakeholders."],
+      primary: [
+        "SQL and data analysis",
+        "Python or spreadsheet-based analysis",
+        "Dashboards and data visualization",
+      ],
+      secondary: [
+        "Statistics and data quality",
+        "Power BI or Tableau",
+        "Stakeholder communication",
+      ],
+      responsibilities: [
+        "Collect, clean and analyze relevant datasets.",
+        "Build reports and dashboards for decision-making.",
+        "Identify trends, patterns and actionable insights.",
+        "Communicate findings to business stakeholders.",
+      ],
     },
     {
       keys: ["hr", "human resources", "recruiter", "talent acquisition"],
       title: "HR / Talent Acquisition Specialist",
-      primary: ["Recruitment and candidate screening", "Interview coordination and communication", "Applicant tracking systems"],
-      secondary: ["Employer branding and sourcing", "Recruitment metrics and reporting", "Stakeholder management"],
-      responsibilities: ["Manage candidate sourcing and screening.", "Coordinate interviews and hiring feedback.", "Maintain accurate candidate records.", "Partner with hiring managers to meet recruitment goals."],
+      primary: [
+        "Recruitment and candidate screening",
+        "Interview coordination and communication",
+        "Applicant tracking systems",
+      ],
+      secondary: [
+        "Employer branding and sourcing",
+        "Recruitment metrics and reporting",
+        "Stakeholder management",
+      ],
+      responsibilities: [
+        "Manage candidate sourcing and screening.",
+        "Coordinate interviews and hiring feedback.",
+        "Maintain accurate candidate records.",
+        "Partner with hiring managers to meet recruitment goals.",
+      ],
     },
   ];
 
@@ -101,14 +169,28 @@ function generateJD(prompt) {
   );
 
   const role = selectedRole || {
-    title: prompt
-      .replace(/\b(with|for|having|experience|years|year|yrs)\b/gi, " ")
-      .replace(/\s+/g, " ")
-      .trim()
-      .slice(0, 70) || "Professional Role",
-    primary: ["Role-specific technical or functional skills", "Relevant tools, systems and processes", "Problem-solving and domain knowledge"],
-    secondary: ["Communication and collaboration", "Planning, documentation and reporting", "Continuous learning and improvement"],
-    responsibilities: ["Deliver high-quality work aligned with business objectives.", "Collaborate with relevant teams and stakeholders.", "Follow established standards and best practices.", "Monitor outcomes, resolve issues and improve processes."],
+    title:
+      prompt
+        .replace(/\b(with|for|having|experience|years|year|yrs)\b/gi, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, 70) || "Professional Role",
+    primary: [
+      "Role-specific technical or functional skills",
+      "Relevant tools, systems and processes",
+      "Problem-solving and domain knowledge",
+    ],
+    secondary: [
+      "Communication and collaboration",
+      "Planning, documentation and reporting",
+      "Continuous learning and improvement",
+    ],
+    responsibilities: [
+      "Deliver high-quality work aligned with business objectives.",
+      "Collaborate with relevant teams and stakeholders.",
+      "Follow established standards and best practices.",
+      "Monitor outcomes, resolve issues and improve processes.",
+    ],
   };
 
   return {
@@ -117,18 +199,19 @@ function generateJD(prompt) {
     responsibilities: role.responsibilities,
     primarySkills: role.primary,
     secondarySkills: role.secondary,
-    additionalInformation: "We offer a collaborative work environment with opportunities for continuous learning and career growth. Employment type, location, compensation and other role-specific details can be added before publishing.",
+    additionalInformation:
+      "We offer a collaborative work environment with opportunities for continuous learning and career growth. Employment type, location, compensation and other role-specific details can be added before publishing.",
     sourcePrompt: prompt,
     createdAt: Date.now(),
   };
 }
 
 function CreateInterview() {
+  // FIX: useNavigate must be called inside the component.
+  const navigate = useNavigate();
+
   const [chats, setChats] = useState(loadChats);
-  const [activeId, setActiveId] = useState(() => {
-    const initial = loadChats();
-    return initial[0].id;
-  });
+  const [activeId, setActiveId] = useState(() => loadChats()[0].id);
   const [attachments, setAttachments] = useState([]);
   const [listening, setListening] = useState(false);
   const [mobileHistoryOpen, setMobileHistoryOpen] = useState(false);
@@ -138,7 +221,9 @@ function CreateInterview() {
   const textareaRef = useRef(null);
   const recognitionRef = useRef(null);
 
-  const activeChat = chats.find((chat) => chat.id === activeId) || chats[0];
+  const activeChat =
+    chats.find((chat) => chat.id === activeId) || chats[0];
+
   const draft = activeChat?.draft || "";
 
   useEffect(() => {
@@ -149,7 +234,9 @@ function CreateInterview() {
     }
   }, [chats]);
 
-  useEffect(() => () => recognitionRef.current?.stop(), []);
+  useEffect(() => {
+    return () => recognitionRef.current?.stop();
+  }, []);
 
   function updateActiveChat(updates) {
     if (!activeChat) return;
@@ -168,6 +255,7 @@ function CreateInterview() {
     setListening(false);
 
     const chat = createChat();
+
     setChats((previous) => [chat, ...previous]);
     setActiveId(chat.id);
     setAttachments([]);
@@ -206,7 +294,10 @@ function CreateInterview() {
       setActiveId(fresh.id);
     } else {
       setChats(remaining);
-      if (activeId === chatId) setActiveId(remaining[0].id);
+
+      if (activeId === chatId) {
+        setActiveId(remaining[0].id);
+      }
     }
 
     setAttachments([]);
@@ -214,7 +305,11 @@ function CreateInterview() {
 
   function handleAttachment(event) {
     const files = Array.from(event.target.files || []);
-    if (files.length) setAttachments((previous) => [...previous, ...files]);
+
+    if (files.length) {
+      setAttachments((previous) => [...previous, ...files]);
+    }
+
     event.target.value = "";
   }
 
@@ -223,7 +318,9 @@ function CreateInterview() {
       window.SpeechRecognition || window.webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
-      window.alert("Voice input is not supported in this browser. Try Chrome.");
+      window.alert(
+        "Voice input is not supported in this browser. Try Chrome."
+      );
       return;
     }
 
@@ -234,6 +331,7 @@ function CreateInterview() {
     }
 
     const recognition = new SpeechRecognition();
+
     recognition.lang = "en-IN";
     recognition.interimResults = false;
     recognition.continuous = true;
@@ -242,12 +340,17 @@ function CreateInterview() {
       let transcript = "";
 
       for (let i = event.resultIndex; i < event.results.length; i++) {
-        if (event.results[i].isFinal) transcript += event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          transcript += event.results[i][0].transcript;
+        }
       }
 
       if (transcript) {
         const currentDraft = textareaRef.current?.value || "";
-        updateActiveChat({ draft: `${currentDraft} ${transcript}`.trim() });
+
+        updateActiveChat({
+          draft: `${currentDraft} ${transcript}`.trim(),
+        });
       }
     };
 
@@ -268,18 +371,24 @@ function CreateInterview() {
     event.preventDefault();
 
     const text = draft.trim();
-    if ((!text && !attachments.length) || !activeChat || generating) return;
+
+    if ((!text && !attachments.length) || !activeChat || generating) {
+      return;
+    }
 
     const firstUserMessage = !activeChat.messages.some(
       (message) => message.role === "user"
     );
 
     const names = attachments.map((file) => file.name);
+
     const userMessage = {
       id: `${Date.now()}-user`,
       role: "user",
       type: "text",
-      text: text || `Please review the attached file(s): ${names.join(", ")}`,
+      text:
+        text ||
+        `Please review the attached file(s): ${names.join(", ")}`,
       attachments: names,
     };
 
@@ -287,14 +396,14 @@ function CreateInterview() {
       previous.map((chat) =>
         chat.id === activeChat.id
           ? {
-              ...chat,
-              title: firstUserMessage
-                ? (text || names[0] || "New conversation").slice(0, 42)
-                : chat.title,
-              draft: "",
-              updatedAt: Date.now(),
-              messages: [...chat.messages, userMessage],
-            }
+            ...chat,
+            title: firstUserMessage
+              ? (text || names[0] || "New conversation").slice(0, 42)
+              : chat.title,
+            draft: "",
+            updatedAt: Date.now(),
+            messages: [...chat.messages, userMessage],
+          }
           : chat
       )
     );
@@ -305,9 +414,10 @@ function CreateInterview() {
 
     setGenerating(true);
 
-    // Demo generator for the frontend. Replace with your AI API call.
+    // Existing frontend demo generator.
     window.setTimeout(() => {
       const jd = generateJD(text);
+
       const resultMessage = {
         id: `${Date.now()}-jd`,
         role: "assistant",
@@ -319,10 +429,10 @@ function CreateInterview() {
         previous.map((chat) =>
           chat.id === activeChat.id
             ? {
-                ...chat,
-                updatedAt: Date.now(),
-                messages: [...chat.messages, resultMessage],
-              }
+              ...chat,
+              updatedAt: Date.now(),
+              messages: [...chat.messages, resultMessage],
+            }
             : chat
         )
       );
@@ -334,7 +444,7 @@ function CreateInterview() {
   function handleContinue(jd) {
     try {
       localStorage.setItem(SELECTED_JD_KEY, JSON.stringify(jd));
-      window.alert("JD saved. You can now connect this action to your next step.");
+      navigate("/job-description-editor");
     } catch (error) {
       console.error("Unable to save selected JD:", error);
       window.alert("Unable to save this JD in browser storage.");
@@ -343,20 +453,24 @@ function CreateInterview() {
 
   function handleCreateMore(jd) {
     const refinement = `Please refine this job description for ${jd.title}. Add more relevant details and responsibilities.`;
+
     updateActiveChat({ draft: refinement });
     textareaRef.current?.focus();
   }
 
   return (
     <main className="flex min-h-0 min-w-0 flex-col bg-[#F5F6FF] p-3 sm:p-5 lg:h-[calc(100dvh-66px)] lg:overflow-hidden lg:p-6">
+
       <div className="shrink-0">
         <Breadcrumb
           items={[
             { label: "Dashboard", to: "/dashboard" },
-            { label: "Create Interview" },
+            { label: "Create Interview", to: "/create-interview" },
+            { label: "Job Description", to: "/job-description-editor" },
           ]}
         />
       </div>
+
 
       <header className="mb-4 flex shrink-0 items-center justify-between gap-3 sm:mb-5">
         <div className="flex min-w-0 items-center gap-3">
@@ -392,6 +506,7 @@ function CreateInterview() {
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-100 text-violet-600">
                 <Bot size={21} />
               </div>
+
               <div className="min-w-0">
                 <h2 className="truncate text-sm font-semibold text-slate-900">
                   AI Hiring Assistant
@@ -418,13 +533,20 @@ function CreateInterview() {
                 {message.role === "user" ? (
                   <div className="flex justify-end gap-3">
                     <div className="max-w-[85%] rounded-2xl rounded-br-md bg-violet-600 px-4 py-3 text-sm leading-6 text-white">
-                      <p className="whitespace-pre-wrap">{message.text}</p>
+                      <p className="whitespace-pre-wrap">
+                        {message.text}
+                      </p>
+
                       {message.attachments?.map((name) => (
-                        <p key={name} className="mt-1 text-xs opacity-80">
+                        <p
+                          key={name}
+                          className="mt-1 text-xs opacity-80"
+                        >
                           📎 {name}
                         </p>
                       ))}
                     </div>
+
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600">
                       <UserRound size={17} />
                     </div>
@@ -434,6 +556,7 @@ function CreateInterview() {
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-100 text-violet-600">
                       <Bot size={17} />
                     </div>
+
                     <div className="min-w-0 flex-1">
                       {message.type === "jd" ? (
                         <JDResult
@@ -464,6 +587,7 @@ function CreateInterview() {
                 <p className="mb-3 text-xs font-medium text-slate-500">
                   Try an example
                 </p>
+
                 <div className="flex flex-wrap gap-2">
                   {[
                     "Frontend Developer with 3+ years of experience",
@@ -496,7 +620,10 @@ function CreateInterview() {
                       key={`${file.name}-${index}`}
                       className="inline-flex max-w-full items-center gap-2 rounded-lg bg-violet-50 px-2 py-1 text-xs text-violet-700"
                     >
-                      <span className="max-w-44 truncate">{file.name}</span>
+                      <span className="max-w-44 truncate">
+                        {file.name}
+                      </span>
+
                       <button
                         type="button"
                         onClick={() =>
@@ -541,7 +668,10 @@ function CreateInterview() {
                       updateActiveChat({ draft: event.target.value })
                     }
                     onKeyDown={(event) => {
-                      if (event.key === "Enter" && !event.shiftKey) {
+                      if (
+                        event.key === "Enter" &&
+                        !event.shiftKey
+                      ) {
                         event.preventDefault();
                         event.currentTarget.form?.requestSubmit();
                       }
@@ -550,6 +680,7 @@ function CreateInterview() {
                     aria-label="Describe the role you want to hire for"
                     className="max-h-28 min-h-6 w-full resize-y bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-500"
                   />
+
                   <p className="mt-1 hidden truncate text-xs text-slate-400 sm:block">
                     Press Enter to send · Shift + Enter for a new line
                   </p>
@@ -558,11 +689,10 @@ function CreateInterview() {
                 <button
                   type="button"
                   onClick={handleSpeak}
-                  className={`flex h-10 w-8 shrink-0 items-center justify-center rounded-full ${
-                    listening
-                      ? "bg-violet-100 text-violet-700"
-                      : "text-slate-700 hover:bg-violet-50 hover:text-violet-600"
-                  }`}
+                  className={`flex h-10 w-8 shrink-0 items-center justify-center rounded-full ${listening
+                    ? "bg-violet-100 text-violet-700"
+                    : "text-slate-700 hover:bg-violet-50 hover:text-violet-600"
+                    }`}
                   aria-label={listening ? "Stop voice input" : "Speak"}
                 >
                   <Mic size={21} />
@@ -570,7 +700,9 @@ function CreateInterview() {
 
                 <button
                   type="submit"
-                  disabled={generating || (!draft.trim() && !attachments.length)}
+                  disabled={
+                    generating || (!draft.trim() && !attachments.length)
+                  }
                   className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-violet-600 text-white shadow-md transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-50 sm:h-12 sm:w-12"
                   aria-label="Send message"
                 >

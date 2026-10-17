@@ -76,3 +76,142 @@
     transform: none;
   }
 }
+/* Rich text editor */
+.jd-rich-editor .quill {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.jd-rich-editor .ql-toolbar.ql-snow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  border: 0;
+  border-bottom: 1px solid #f1f5f9;
+  padding: 10px 12px;
+}
+
+.jd-rich-editor .ql-toolbar .ql-formats {
+  margin-right: 6px;
+}
+
+.jd-rich-editor .ql-container.ql-snow {
+  border: 0;
+  min-width: 0;
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.jd-rich-editor .ql-editor {
+  min-height: 310px;
+  padding: 20px;
+  color: #475569;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.jd-rich-editor .ql-editor h2,
+.jd-rich-editor .ql-editor h3 {
+  margin-top: 18px;
+  margin-bottom: 8px;
+  color: #1e293b;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.jd-rich-editor .ql-editor p,
+.jd-rich-editor .ql-editor ul,
+.jd-rich-editor .ql-editor ol {
+  margin-bottom: 10px;
+}
+
+.jd-rich-editor .ql-editor.ql-blank::before {
+  left: 20px;
+  color: #94a3b8;
+  font-style: normal;
+}
+
+.jd-rich-editor .ql-snow .ql-stroke {
+  stroke: #64748b;
+}
+
+.jd-rich-editor .ql-snow .ql-fill {
+  fill: #64748b;
+}
+
+.jd-rich-editor .ql-snow .ql-picker {
+  color: #475569;
+}
+
+.jd-rich-editor .ql-snow button:hover .ql-stroke,
+.jd-rich-editor .ql-snow button.ql-active .ql-stroke {
+  stroke: #7c3aed;
+}
+
+.jd-rich-editor .ql-snow button:hover .ql-fill,
+.jd-rich-editor .ql-snow button.ql-active .ql-fill {
+  fill: #7c3aed;
+}
+
+/* Live preview */
+.jd-preview-content {
+  overflow-wrap: anywhere;
+}
+
+.jd-preview-content h1,
+.jd-preview-content h2,
+.jd-preview-content h3 {
+  margin-top: 15px;
+  margin-bottom: 6px;
+  color: #1e293b;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+.jd-preview-content h1:first-child,
+.jd-preview-content h2:first-child,
+.jd-preview-content h3:first-child {
+  margin-top: 0;
+}
+
+.jd-preview-content p {
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+}
+
+.jd-preview-content ul,
+.jd-preview-content ol {
+  margin: 6px 0 10px;
+  padding-left: 18px;
+}
+
+.jd-preview-content ul {
+  list-style: disc;
+}
+
+.jd-preview-content ol {
+  list-style: decimal;
+}
+
+.jd-preview-content li {
+  margin-bottom: 4px;
+}
+
+.jd-preview-content a {
+  color: #7c3aed;
+  text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+  .jd-rich-editor .ql-editor {
+    min-height: 260px;
+    padding: 16px;
+  }
+
+  .jd-rich-editor .ql-toolbar.ql-snow {
+    padding: 8px;
+  }
+}
+
