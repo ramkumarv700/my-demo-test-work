@@ -611,7 +611,7 @@ function CreateInterview() {
           <div className="shrink-0 bg-white p-3 pt-2 sm:p-5 sm:pt-2">
             <form
               onSubmit={handleSubmit}
-              className="rounded-[28px] border border-violet-200 bg-white p-3 shadow-[0_8px_28px_rgba(124,58,237,0.12)] transition focus-within:border-violet-400 sm:p-4"
+              className="rounded-full border border-violet-200 bg-white p-3 shadow-[0_8px_28px_rgba(124,58,237,0.12)] transition focus-within:border-violet-400 sm:p-4"
             >
               {attachments.length > 0 && (
                 <div className="flex flex-wrap gap-2 pb-2">
