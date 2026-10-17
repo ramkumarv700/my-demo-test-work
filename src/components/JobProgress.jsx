@@ -13,7 +13,7 @@ export default function JobProgress() {
 
   return (
     <section className="min-w-0 rounded-2xl  bg-white p-4  sm:p-5">
-      <h2 className="font-semibold text-slate-900">Job Progress</h2>
+      <h2 className="section-title">Job Progress</h2>
       <p className="mt-1 text-xs text-slate-400 sm:text-sm">
         Overviews of jobs by current status
       </p>

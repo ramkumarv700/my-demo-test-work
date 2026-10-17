@@ -4,7 +4,7 @@ import { countriesData } from "../data/dashboardData"
 export default function PopularCountries() {
   return (
     <section className="flex h-full min-w-0 flex-col rounded-2xl  bg-white p-4  sm:p-5">
-      <h2 className="font-semibold text-slate-900">
+      <h2 className="section-title">
         Popular countries
       </h2>
 

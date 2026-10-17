@@ -36,7 +36,7 @@ function Header({ onMenuClick }) {
           ☰
         </button>
 
-        <h2 className="text-base font-semibold text-gray-900 sm:text-lg">
+        <h2 className="section-title">
           Admin Dashboard
         </h2>
 
